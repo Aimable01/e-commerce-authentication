@@ -2,6 +2,10 @@ import { pool } from "../database/dbConn";
 import { Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 pool
   .connect()
@@ -33,3 +37,28 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 // user login
+export const login = async (req: Request, res: Response): Promise<void> => {
+  const { email, password } = req.body;
+  try {
+    //  check if user is registered
+    const user = (
+      await pool.query(`SELECT id,email,password FROM users WHERE email = $1`, [
+        email,
+      ])
+    ).rows[0];
+    if (!user) res.status(404).json({ message: "user not found" });
+
+    //  check if the password is correct
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch)
+      res.status(400).json({ message: "password do not match" });
+
+    //  generate the token
+    const token = jwt.sign({ id: user.id }, process.env.secretKey!, {
+      expiresIn: "720h",
+    });
+    res.status(200).json({ user: user, token: token });
+  } catch (error) {
+    res.status(500).json({ message: `An error: ${error}` });
+  }
+};
