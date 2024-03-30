@@ -13,8 +13,8 @@ pool
     pool.query(`CREATE TABLE IF NOT EXISTS users(
         id TEXT PRIMARY KEY NOT NULL,
         fullName VARCHAR(200) NOT NULL,
-        email VARCHAR(200) NOT NULL UNIQUE,
-        password TEXT NOT NULL
+        email VARCHAR(200) UNIQUE,
+        password TEXT 
     )`);
   })
   .catch((err) => console.log(`An error in creating table users: ${err}`));

@@ -10,8 +10,8 @@ googleRouter.get(
 
 googleRouter.get(
   "/google/redirect",
-  passport.authenticate("google", { failureRedirect: "/google" }),
+  passport.authenticate("google", { failureRedirect: "/auth/google" }),
   (req: Request, res: Response) => {
-    res.send("Google login success");
+    res.redirect("/home");
   }
 );
